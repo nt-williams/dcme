@@ -26,7 +26,7 @@ if (misspec == 4) mu_learners <- "SL.mean"
 # dat <- gendata(1000, seed)
 # psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1)
 
-res <- map_dfr(c(500, 1000, 2000, 5000), function(n) {
+res <- map_dfr(c(500, 1000, 2000, 5000, 1e4), function(n) {
   seed <- floor(runif(1, min = 1000, max = 1e5))
   dat <- gendata(n, seed)
   psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1,

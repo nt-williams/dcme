@@ -22,20 +22,54 @@ summary <- function(zip) {
   group_by(res, n) |>
     filter(between(ciie, -1, 1),
            between(cide, -1, 1)) |>
-    summarize(# across(c(ciie, cide), mean, .names = "{.col}_{.fn}"),
-              ciie_bias = abs(mean(ciie - !!ciie)),
+    summarize(ciie_bias = abs(mean(ciie - !!ciie)),
               cide_bias = abs(mean(cide - !!cide)),
               ciie_covr = mean(map2_lgl(ciie.conf.low, ciie.conf.high, ~ between(!!ciie, .x, .y))),
-              cide_covr = mean(map2_lgl(cide.conf.low, cide.conf.high, ~ between(!!cide, .x, .y)))) |>
-    mutate(across(c(ciie_bias, cide_bias), ~ .x * sqrt(n), .names = "{.col}_rootn"))
+              cide_covr = mean(map2_lgl(cide.conf.low, cide.conf.high, ~ between(!!cide, .x, .y))),
+              ciie_relmse = mean(n * (ciie - !!ciie)^2 / !!bound_ciie),
+              cide_relmse = mean(n * (cide - !!cide)^2 / !!bound_cide)) |>
+    mutate(across(c(ciie_bias, cide_bias), ~ .x * sqrt(n), .names = "{.col}rootn"))
+}
+
+make_table <- function(data) {
+  kableExtra::kbl(data,
+      "latex",
+      booktabs = TRUE,
+      digits = 2,
+      linesep = "",
+      col.names = c("Misspecifed", "$n$", "$\\text{Bias}$", "$\\sqrt{n} \\times \\text{Bias}$", "95\\% CI Covr.", "Rel. Efficiency"),
+      escape = FALSE,
+      align = "clcccc") |>
+    kableExtra::collapse_rows(1, "middle")
 }
 
 files <- glue("_research/data/sim_{0:4}.zip")
 names(files) <- 0:4
 
-plan(multisession, workers = 10)
-future_map_dfr(files, summary, .id = "spec")
+plan(multisession, workers = 4)
+res <- future_map_dfr(files, summary, .id = "spec")
 plan(sequential)
 
-summary("_research/data/sim_0.zip")
+res <- pivot_longer(res, ciie_bias:cide_biasrootn, names_to = c("param", ".value"), names_pattern = "(.+)_(.+)")
+res_ciie <- filter(res, param == "ciie", n != 2000)
+res_cide <- filter(res, param == "cide", n != 2000)
 
+select(res_ciie, spec, n, bias, biasrootn, covr, relmse) |>
+  mutate(spec = case_when(
+    spec == 0 ~ "",
+    spec == 1 ~ "$\\q$",
+    spec == 2 ~ "$\\p$",
+    spec == 3 ~ "$\\cc$",
+    spec == 4 ~ "$\\mu$"
+  )) |>
+  make_table()
+
+select(res_cide, spec, n, bias, biasrootn, covr, relmse) |>
+  mutate(spec = case_when(
+    spec == 0 ~ "",
+    spec == 1 ~ "$\\q$",
+    spec == 2 ~ "$\\p$",
+    spec == 3 ~ "$\\cc$",
+    spec == 4 ~ "$\\mu$"
+  )) |>
+  make_table()
