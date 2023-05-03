@@ -9,11 +9,11 @@ fit_mu <- function(data, npsem, q, c, folds, family, learners) {
                     "mu(Y|0,0,w)")
 
   # fit the correct model for E[Y | M,Z,W] and integrate out M | L, Z, W and Z | A, W
-  int_out <- function(m, q, c, L, A) {
+  int_out <- function(L, A) {
     # Z = 1
-    (m[[1]] * c[, gl("c(M=1|{L},1,w)")] + m[[2]] * (1 - c[, gl("c(M=1|{L},1,w)")])) * q[, gl("q(Z=1|{L},{A},w)")] +
+    (preds[[1]] * c[, gl("c(M=1|{L},1,w)")] + preds[[2]] * (1 - c[, gl("c(M=1|{L},1,w)")])) * q[, gl("q(Z=1|{L},{A},w)")] +
       # Z = 0
-      (m[[3]] * c[, gl("c(M=1|{L},0,w)")] + m[[4]] * (1 - c[, gl("c(M=1|{L},0,w)")])) * (1 - q[, gl("q(Z=1|{L},{A},w)")])
+      (preds[[3]] * c[, gl("c(M=1|{L},0,w)")] + preds[[4]] * (1 - c[, gl("c(M=1|{L},0,w)")])) * (1 - q[, gl("q(Z=1|{L},{A},w)")])
   }
 
   for (v in seq_along(folds)) {
@@ -38,9 +38,7 @@ fit_mu <- function(data, npsem, q, c, folds, family, learners) {
                          list(0, 1, preds),
                          list(1, 0, preds),
                          list(0, 0, preds)),
-                    function(x) {
-                      int_out(x[[3]], q, c, x[[1]], x[[2]])
-                    })
+                    function(x) int_out(x[[1]], x[[2]]))
 
     for (j in 4:7) {
       mu[folds[[v]]$validation_set, j] <- preds[[j - 3]]

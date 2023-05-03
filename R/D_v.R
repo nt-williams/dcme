@@ -14,10 +14,10 @@ D_v <- function(data, npsem, aprime, astar, g, q, p, c, mu) {
   `mu(0,a',W)` <- mu[, gl("mu(Y|0,{aprime},w)")]
   `mu(1,a',W)` <- mu[, gl("mu(Y|1,{aprime},w)")]
 
-  GAMMAs <- gamma(astar, c, p, q)
-  `mu(0,a',W)gamma(0|a*,W)` <- `mu(0,a',W)` * GAMMAs[, "gamma(M=0|a*,w)"]
-  `mu(1,a',W)gamma(1|a*,W)` <- `mu(1,a',W)` * GAMMAs[, "gamma(M=1|a*,w)"]
-  `gamma(L|a*,W)` <- l * GAMMAs[, gl("gamma(M=1|a*,w)")] + (1 - l) * GAMMAs[, gl("gamma(M=0|a*,w)")]
+  `gamma(1|a*,W)` <- gamma(astar, c, p, q)
+  `mu(0,a',W)gamma(0|a*,W)` <- `mu(0,a',W)` * (1 - `gamma(1|a*,W)`)
+  `mu(1,a',W)gamma(1|a*,W)` <- `mu(1,a',W)` * `gamma(1|a*,W)`
+  `gamma(L|a*,W)` <- l * `gamma(1|a*,W)` + (1 - l) * (1 - `gamma(1|a*,W)`)
 
   `v(a',a*)` <- mean(`mu(0,a',W)gamma(0|a*,W)`) + mean(`mu(1,a',W)gamma(1|a*,W)`)
 
@@ -37,17 +37,8 @@ gamma <- function(astar, c, p, q) {
   gamm <- matrix(nrow = nrow(c), ncol = 2)
   colnames(gamm) <- c("gamma(M=1|a*,w)", "gamma(M=0|a*,w)")
 
-  gamm[, "gamma(M=1|a*,w)"] <-
-    # L = 1
-    (c[, "c(M=1|1,1,w)"] * `q(Z=1|1,a*,w)` + c[, "c(M=1|1,0,w)"] * (1 - `q(Z=1|1,a*,w)`)) * `p(L=1|a*,w)` +
+  # L = 1
+  (c[, "c(M=1|1,1,w)"] * `q(Z=1|1,a*,w)` + c[, "c(M=1|1,0,w)"] * (1 - `q(Z=1|1,a*,w)`)) * `p(L=1|a*,w)` +
     # L = 0
     (c[, "c(M=1|0,1,w)"] * `q(Z=1|0,a*,w)` + c[, "c(M=1|0,0,w)"] * (1 - `q(Z=1|0,a*,w)`)) * (1 - `p(L=1|a*,w)`)
-
-  gamm[, "gamma(M=0|a*,w)"] <-
-    # L = 1
-    ((1 - c[, "c(M=1|1,1,w)"]) * `q(Z=1|1,a*,w)` + (1 - c[, "c(M=1|1,0,w)"]) * (1 - `q(Z=1|1,a*,w)`)) * `p(L=1|a*,w)` +
-    # L = 0
-    ((1 - c[, "c(M=1|0,1,w)"]) * `q(Z=1|0,a*,w)` + (1 - c[, "c(M=1|0,0,w)"]) * (1 - `q(Z=1|0,a*,w)`)) * (1 - `p(L=1|a*,w)`)
-
-  gamm
 }

@@ -13,7 +13,7 @@
 #' @param q_learners SuperLearner library, default is "SL.glm"
 #' @param p_learners SuperLearner library, default is "SL.glm"
 #' @param c_learners SuperLearner library, default is "SL.glm"
-#' @param mu_learners SuperLearner library, default is "SL.glm"
+#' @param y_learners SuperLearner library, default is "SL.glm"
 #'
 #' @return A list of parameter estimates and confidence intervals.
 #'
@@ -26,7 +26,7 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
                  q_learners = "SL.glm",
                  p_learners = "SL.glm",
                  c_learners = "SL.glm",
-                 mu_learners = "SL.glm") {
+                 y_learners = "SL.glm") {
 
   dgm <- Npsem$new(W, A, Z, M, L, Y)
   .data <- dgm$dt(data)
@@ -36,7 +36,7 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
   q <- fit_q(.data, dgm, folded, q_learners)
   p <- fit_p(.data, dgm, folded, p_learners)
   cc <- fit_c(.data, dgm, folded, c_learners)
-  mu <- fit_mu(.data, dgm, q, cc, folded, match.arg(family), mu_learners)
+  mu <- fit_mu(.data, dgm, q, cc, folded, match.arg(family), y_learners)
 
   D_v11 <- D_v(.data, dgm, 1, 1, g, q, p, cc, mu)
   D_v10 <- D_v(.data, dgm, 1, 0, g, q, p, cc, mu)
@@ -79,17 +79,4 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
     ci <- p[[2]] + c(-1, 1)*qnorm(0.975)*se
     list(psi = p[[2]], se = se, ci = ci)
   })
-
-  # list(
-  #   D_TIIDE = D_TIIDE,
-  #   TIIDE = mean(D_TIIDE),
-  #   D_TIIIE = D_TIIIE,
-  #   TIIIE = mean(D_TIIIE),
-  #   D_JFS = D_JFS,
-  #   JFS = mean(D_JFS),
-  #   D_CIDE = (D_TIIDE / mean(D_JFS)) - ((mean(D_TIIDE)*D_JFS) / (mean(D_JFS)^2)),
-  #   CIDE = mean(D_TIIDE) / mean(D_JFS),
-  #   D_CIIE = (D_TIIIE / mean(D_JFS)) - ((mean(D_TIIIE)*D_JFS) / (mean(D_JFS)^2)),
-  #   CIIE = mean(D_TIIIE) / mean(D_JFS)
-  # )
 }
