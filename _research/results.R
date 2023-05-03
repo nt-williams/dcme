@@ -24,6 +24,9 @@ summary <- function(zip) {
            between(cide, -1, 1)) |>
     summarize(ciie_bias = abs(mean(ciie - !!ciie)),
               cide_bias = abs(mean(cide - !!cide)),
+              tiiie_bias = abs(mean(tiiie - !!tiiie)),
+              tiide_bias = abs(mean(tiide - !!tiide)),
+              jfs_bias = abs(mean(jfs - !!jfs)),
               ciie_covr = mean(map2_lgl(ciie.conf.low, ciie.conf.high, ~ between(!!ciie, .x, .y))),
               cide_covr = mean(map2_lgl(cide.conf.low, cide.conf.high, ~ between(!!cide, .x, .y))),
               ciie_relmse = mean(n * (ciie - !!ciie)^2 / !!bound_ciie),
@@ -43,10 +46,11 @@ make_table <- function(data) {
     kableExtra::collapse_rows(1, "middle")
 }
 
-files <- glue("_research/data/sim_{0:4}.zip")
-names(files) <- 0:4
+i <- 0:2
+files <- glue("_research/data/sim_{i}.zip")
+names(files) <- i
 
-plan(multisession, workers = 4)
+plan(multisession, workers = length(i))
 res <- future_map_dfr(files, summary, .id = "spec")
 plan(sequential)
 

@@ -15,12 +15,10 @@ g_learners <- "SL.mean"
 q_learners <- "SL.glm"
 p_learners <- "SL.glm"
 c_learners <- "SL.glm"
-mu_learners <- "SL.glm"
+y_learners <- "SL.glm"
 
-if (misspec == 1) q_learners <- "SL.mean"
+if (misspec == 1) y_learners <- "SL.mean"
 if (misspec == 2) p_learners <- "SL.mean"
-if (misspec == 3) c_learners <- "SL.mean"
-if (misspec == 4) mu_learners <- "SL.mean"
 
 # seed <- floor(runif(1, min = 1000, max = 1e5))
 # dat <- gendata(1000, seed)
@@ -34,7 +32,7 @@ res <- map_dfr(c(500, 1000, 2000, 5000, 1e4), function(n) {
               q_learners = q_learners,
               p_learners = p_learners,
               c_learners = c_learners,
-              mu_learners = mu_learners)
+              y_learners = y_learners)
 
   data.frame(n = n, seed = seed,
              tiide = psi$TIIDE[[1]], tiiie = psi$TIIIE[[1]], jfs = psi$JFS[[1]],
