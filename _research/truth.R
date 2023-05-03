@@ -12,9 +12,9 @@ tmp <- mutate(tmp,
 
 v_aprime_astar <- function(aprime, astar) {
   weighted.mean(mu(1, aprime, tmp[, paste0("W", 1:3)]) *
-                  gamma(1, astar, tmp[, paste0("W", 1:3)]), tmp$prob_W) +
+                  Gamma(1, astar, tmp[, paste0("W", 1:3)]), tmp$prob_W) +
     weighted.mean(mu(0, aprime, tmp[, paste0("W", 1:3)]) *
-                    gamma(0, astar, tmp[, paste0("W", 1:3)]), tmp$prob_W)
+                    Gamma(0, astar, tmp[, paste0("W", 1:3)]), tmp$prob_W)
 }
 
 phi_al <- function(a, l) {
@@ -40,9 +40,9 @@ Dv_aprime_astar <- function(data, aprime, astar) {
   `mu(0,a',W)` <- mu(0, aprime, w)
   `mu(1,a',W)` <- mu(1, aprime, w)
 
-  `mu(0,a',W)gamma(0|a*,W)` <- `mu(0,a',W)` * gamma(0, astar, w)
-  `mu(1,a',W)gamma(1|a*,W)` <- `mu(1,a',W)` * gamma(1, astar, w)
-  `gamma(L|a*,W)` <- l*gamma(1, astar, w) + (1 - l)*gamma(0, astar, w)
+  `mu(0,a',W)gamma(0|a*,W)` <- `mu(0,a',W)` * Gamma(0, astar, w)
+  `mu(1,a',W)gamma(1|a*,W)` <- `mu(1,a',W)` * Gamma(1, astar, w)
+  `gamma(L|a*,W)` <- l*Gamma(1, astar, w) + (1 - l)*Gamma(0, astar, w)
 
   # `v(a',a*)` <- mean(`mu(0,a',W)gamma(0|a*,W)`) + mean(`mu(1,a',W)gamma(1|a*,W)`)
 

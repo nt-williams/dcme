@@ -21,9 +21,6 @@ fit_mu <- function(data, npsem, q, c, folds, family, learners) {
 
     valid <- lapply(
       list(
-        # data,
-        # npsem$modify(data, "M", 1),
-        # npsem$modify(data, "M", 0),
         npsem$modify(npsem$modify(data, "M", 1), "Z", 1),
         npsem$modify(npsem$modify(data, "M", 0), "Z", 1),
         npsem$modify(npsem$modify(data, "M", 1), "Z", 0),
@@ -35,8 +32,8 @@ fit_mu <- function(data, npsem, q, c, folds, family, learners) {
                       family, learners = learners, bound = TRUE)
 
     preds <- lapply(list(list(1, 1, preds),
-                         list(0, 1, preds),
                          list(1, 0, preds),
+                         list(0, 1, preds),
                          list(0, 0, preds)),
                     function(x) int_out(x[[1]], x[[2]]))
 

@@ -21,7 +21,7 @@ my <- function(m, z, w) {
   plogis(rowSums(-log(5)*w) + z + m + .3)
 }
 
-gamma <- function(m, astar, w) {
+Gamma <- function(m, astar, w) {
   (pm(m, 1, 1, w) * pz(1, astar, 1, w) + pm(m, 1, 0, w) * pz(0, astar, 1, w)) * pl(1, astar, w) +
     (pm(m, 0, 1, w) * pz(1, astar, 0, w) + pm(m, 0, 0, w) * pz(0, astar, 0, w)) * pl(0, astar, w)
 }
