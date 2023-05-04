@@ -58,22 +58,18 @@ res <- pivot_longer(res, ciie_bias:cide_biasrootn, names_to = c("param", ".value
 res_ciie <- filter(res, param == "ciie", n != 2000)
 res_cide <- filter(res, param == "cide", n != 2000)
 
-select(res_ciie, spec, n, bias, biasrootn, covr, relmse) |>
-  mutate(spec = case_when(
+spec_to_latex <- function(data) {
+  mutate(data, spec = case_when(
     spec == 0 ~ "",
-    spec == 1 ~ "$\\q$",
-    spec == 2 ~ "$\\p$",
-    spec == 3 ~ "$\\cc$",
-    spec == 4 ~ "$\\mu$"
-  )) |>
+    spec == 1 ~ "$\\E(Y \\mid M, Z, W)$",
+    spec == 2 ~ "$\\P(L \\mid A,W)$",
+  ))
+}
+
+select(res_ciie, spec, n, bias, biasrootn, covr, relmse) |>
+  spec_to_latex() |>
   make_table()
 
 select(res_cide, spec, n, bias, biasrootn, covr, relmse) |>
-  mutate(spec = case_when(
-    spec == 0 ~ "",
-    spec == 1 ~ "$\\q$",
-    spec == 2 ~ "$\\p$",
-    spec == 3 ~ "$\\cc$",
-    spec == 4 ~ "$\\mu$"
-  )) |>
+  spec_to_latex() |>
   make_table()
