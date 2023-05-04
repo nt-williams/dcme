@@ -18,7 +18,7 @@ dcme(
   q_learners = "SL.glm",
   p_learners = "SL.glm",
   c_learners = "SL.glm",
-  mu_learners = "SL.glm"
+  y_learners = "SL.glm"
 )
 }
 \arguments{
@@ -39,6 +39,16 @@ dcme(
 \item{family}{Variable type for outcome, Y. Options are "binomial" or "gaussian"}
 
 \item{folds}{Number of folds for crossfitting}
+
+\item{g_learners}{SuperLearner library, default is "SL.glm"}
+
+\item{q_learners}{SuperLearner library, default is "SL.glm"}
+
+\item{p_learners}{SuperLearner library, default is "SL.glm"}
+
+\item{c_learners}{SuperLearner library, default is "SL.glm"}
+
+\item{y_learners}{SuperLearner library, default is "SL.glm"}
 }
 \value{
 A list of parameter estimates and confidence intervals.
