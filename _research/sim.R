@@ -17,7 +17,7 @@ plan(multisession, workers = 10)
 res <- future_map_dfr(1:1000, function(i) {
   seed <- floor(runif(1, min = 1000, max = 1e5))
   dat <- gendata(1e5, seed)
-  psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1,
+  psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 2,
               g_learners = g_learners,
               q_learners = q_learners,
               p_learners = p_learners,
