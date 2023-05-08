@@ -8,16 +8,17 @@ fit_mu <- function(data, npsem, q, c, folds, family, learners) {
                     "mu(Y|0,1,w)",
                     "mu(Y|0,0,w)")
 
-  # fit the correct model for E[Y | M,Z,W] and integrate out M | L, Z, W and Z | A, W
-  int_out <- function(L, A) {
-    # Z = 1
-    (preds[[1]] * c[, gl("c(M=1|{L},1,w)")] + preds[[2]] * (1 - c[, gl("c(M=1|{L},1,w)")])) * q[, gl("q(Z=1|{L},{A},w)")] +
-      # Z = 0
-      (preds[[3]] * c[, gl("c(M=1|{L},0,w)")] + preds[[4]] * (1 - c[, gl("c(M=1|{L},0,w)")])) * (1 - q[, gl("q(Z=1|{L},{A},w)")])
-  }
-
   for (v in seq_along(folds)) {
     train <- origami::training(data, folds[[v]])
+
+    # fit the correct model for E[Y | M,Z,W] and integrate out M | L, Z, W and Z | A, W
+    int_out <- function(L, A) {
+      v <- folds[[v]]$validation_set
+      # Z = 1
+      (preds[[1]] * c[v, gl("c(M=1|{L},1,w)")] + preds[[2]] * (1 - c[v, gl("c(M=1|{L},1,w)")])) * q[v, gl("q(Z=1|{L},{A},w)")] +
+        # Z = 0
+        (preds[[3]] * c[v, gl("c(M=1|{L},0,w)")] + preds[[4]] * (1 - c[v, gl("c(M=1|{L},0,w)")])) * (1 - q[v, gl("q(Z=1|{L},{A},w)")])
+    }
 
     valid <- lapply(
       list(
