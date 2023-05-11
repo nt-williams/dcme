@@ -1,4 +1,4 @@
-fit_mu <- function(data, npsem, q, c, folds, family, learners) {
+fit_mu <- function(data, npsem, folds, family, learners) {
   mu <- matrix(nrow = nrow(data), ncol = 7)
   colnames(mu) <- c("mu(Y|l,a,w)",
                     "mu(Y|1,a,w)",
