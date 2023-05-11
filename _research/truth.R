@@ -1,3 +1,5 @@
+suppressPackageStartupMessages(library(tidyverse))
+
 source("_research/sim_data.R")
 
 tmp <- expand.grid(W1 = c(0, 1), W2 = c(0, 1), W3 = c(0, 1))
