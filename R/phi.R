@@ -26,7 +26,7 @@ fit_phi <- function(data, npsem, folds, learners) {
                       "binomial", learners = learners, bound = TRUE)
 
     for (j in 4:7) {
-      mu[folds[[v]]$validation_set, j] <- preds[[j - 3]]
+      phi[folds[[v]]$validation_set, j] <- preds[[j - 3]]
     }
   }
 

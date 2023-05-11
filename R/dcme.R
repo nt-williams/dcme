@@ -54,8 +54,8 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
   g <- fit_g(.data, dgm, folded, g_learners)
   p <- fit_p(.data, dgm, folded, p_learners)
   mu <- fit_mu(.data, dgm, folded, match.arg(family), mu_learners)
-  gamma <- fit_mu(.data, dgm, folded, gamma_learners)
-  phi <- fit_mu(.data, dgm, folded, phi_learners)
+  gamma <- fit_gamma(.data, dgm, folded, gamma_learners)
+  phi <- fit_phi(.data, dgm, folded, phi_learners)
 
   D_v11 <- D_v(.data, dgm, 1, 1, g, p, mu, gamma)
   D_v10 <- D_v(.data, dgm, 1, 0, g, p, mu, gamma)
