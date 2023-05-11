@@ -5,9 +5,9 @@ D_v <- function(data, npsem, aprime, astar, g, p, mu, gamma) {
   z <- npsem$get(data, "Z")
   y <- npsem$get(data, "Y")
 
-  `P(a'|W)` <- g[, gl("g({aprime}|w)")]
-  `P(a*|W)` <- g[, gl("g({astar}|w)")]
-  `P(L|a',W)` <- l*p[, gl("p(L=1|{aprime},w)")] + (1 - l)*(1 - p[, gl("p(L=1|{aprime},w)")])
+  `P(a'|L,W)` <- aprime*g[, "g(1|l,w)"] + (1 - aprime)*(1 - g[, "g(1|l,w)"])
+  `P(a*|L,W)` <- astar*g[, "g(1|l,w)"] + (1 - astar)*(1 - g[, "g(1|l,w)"])
+  `P(L|W)` <- l*p[, "p(L=1|w)"] + (1 - l)*(1 - p[, "p(L=1|w)"])
 
   `mu(L,a',W)` <- l * mu[, gl("mu(Y|1,{aprime},w)")] + (1 - l) * mu[, gl("mu(Y|0,{aprime},w)")]
   `mu(M,a',W)` <- m * mu[, gl("mu(Y|1,{aprime},w)")] + (1 - m) * mu[, gl("mu(Y|0,{aprime},w)")]
@@ -22,7 +22,7 @@ D_v <- function(data, npsem, aprime, astar, g, p, mu, gamma) {
 
   `v(a',a*)` <- mean(`mu(0,a',W)gamma(0|a*,W)`) + mean(`mu(1,a',W)gamma(1|a*,W)`)
 
-  ((I(a == aprime)*`gamma(L|a*,W)`) / (`P(L|a',W)`*`P(a'|W)`)) * (y - `mu(L,a',W)`) +
-    (I(a == astar)/`P(a*|W)`) * (`mu(M,a',W)` - (`mu(0,a',W)gamma(0|a*,W)` + `mu(1,a',W)gamma(1|a*,W)`)) +
+  ((I(a == aprime)*`gamma(L|a*,W)`) / (`P(L|W)`*`P(a'|L,W)`)) * (y - `mu(L,a',W)`) +
+    (I(a == astar)/`P(a*|L,W)`) * (`mu(M,a',W)` - (`mu(0,a',W)gamma(0|a*,W)` + `mu(1,a',W)gamma(1|a*,W)`)) +
     (`mu(0,a',W)gamma(0|a*,W)` + `mu(1,a',W)gamma(1|a*,W)`)# - `v(a',a*)`
 }

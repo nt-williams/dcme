@@ -5,11 +5,11 @@ D_phi <- function(data, npsem, a, l, g, p, phi) {
   A <- npsem$get(data, "A")
   L <- npsem$get(data, "L")
 
-  `P(l|a,W)` <- l*p[, gl("p(L=1|{a},w)")] + (1 - l)*(1 - p[, gl("p(L=1|{a},w)")])
-  `P(a|W)` <- a*g[, "g(1|w)"] + (1 - a)*g[, "g(0|w)"]
+  `P(l|W)` <- l*p[, "p(L=1|w)"] + (1 - l)*(1 - p[, "p(L=1|w)"])
+  `P(a|l,W)` <- a*g[, gl("g(1|{l},w)")] + (1 - a)*(1 - g[, gl("g(1|{l},w)")])
   `P(MZ=1|l,a,W)` <- phi[, gl("phi(MZ=1|{l},{a},w)")]
 
   # equation 5 in paper
-  ((A == a)*(L == l)) / (`P(a|W)` * `P(l|a,W)`) * (M*Z - `P(MZ=1|l,a,W)`) +
+  ((A == a)*(L == l)) / (`P(a|l,W)` * `P(l|W)`) * (M*Z - `P(MZ=1|l,a,W)`) +
     `P(MZ=1|l,a,W)`# - mean(`P(M=1|l,Z=1,W)`*`P(Z=1|l,a,W)`)
 }
