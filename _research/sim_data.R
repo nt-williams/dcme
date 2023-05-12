@@ -1,5 +1,6 @@
-g <- function(a, w) {
-  a * 0.5 + (1 - a) * (1 - 0.5)
+g <- function(a, l, w) {
+  p <- plogis(rowMeans(-log(2) + w + 1.4*l - 1))
+  a * p + (1 - a) * (1 - p)
 }
 
 pz <- function(z, a, l, w) {
@@ -7,8 +8,8 @@ pz <- function(z, a, l, w) {
   z * p + (1 - z) * (1 - p)
 }
 
-pl <- function(l, a, w) {
-  p <- plogis(rowMeans(-log(2) + w + 3*a - 1))
+pl <- function(l, w) {
+  p <- plogis(rowMeans(-log(2) + w - 0.5))
   l * p + (1 - l) * (1 - p)
 }
 
@@ -22,8 +23,8 @@ my <- function(m, z, w) {
 }
 
 Gamma <- function(m, astar, w) {
-  (pm(m, 1, 1, w) * pz(1, astar, 1, w) + pm(m, 1, 0, w) * pz(0, astar, 1, w)) * pl(1, astar, w) +
-    (pm(m, 0, 1, w) * pz(1, astar, 0, w) + pm(m, 0, 0, w) * pz(0, astar, 0, w)) * pl(0, astar, w)
+  (pm(m, 1, 1, w) * pz(1, astar, 1, w) + pm(m, 1, 0, w) * pz(0, astar, 1, w)) * pl(1, w) +
+    (pm(m, 0, 1, w) * pz(1, astar, 0, w) + pm(m, 0, 0, w) * pz(0, astar, 0, w)) * pl(0, w)
 }
 
 # E(Y|M,Z,W) -> E(Y|L=m,A=a',W)
@@ -42,12 +43,12 @@ gendata <- function(n, seed) {
     rbinom(n, 1, prob = pmin(0.2 + (w_1 + w_2) / 3, 1))
   )
 
-  a <- as.numeric(rbinom(n, 1, prob = g(1, w)))
-  l <- rbinom(n, 1, pl(1, a, w))
+  l <- rbinom(n, 1, pl(1, w))
+  a <- as.numeric(rbinom(n, 1, prob = g(1, l, w)))
   z <- rbinom(n, 1, pz(1, a, l, w))
   m <- rbinom(n, 1, pm(1, l, z, w))
   y <- rbinom(n, 1, my(m, z, w))
 
   colnames(w) <- paste("W", seq_len(ncol(w)), sep = "")
-  as.data.frame(cbind(W = w, A = a, Z = z, L = l, M = m, Y = y))
+  as.data.frame(cbind(W = w, L = l, A = a, Z = z, M = m, Y = y))
 }
