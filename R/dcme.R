@@ -98,6 +98,6 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
     ci <- p[[2]] + c(-1, 1)*qnorm(0.975)*se
     list(psi = p[[2]], se = se, ci = ci)
   })
-  class(res) <- "dcme"
-  print(res)
+  class(res) <- "dcme_results"
+  res
 }
