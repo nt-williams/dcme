@@ -93,9 +93,11 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
     )
   )
 
-  lapply(params, function(p) {
+  res <- lapply(params, function(p) {
     se <- sqrt(var(p[[1]]) / nrow(data))
     ci <- p[[2]] + c(-1, 1)*qnorm(0.975)*se
     list(psi = p[[2]], se = se, ci = ci)
   })
+  class(res) <- "dcme"
+  print(res)
 }
