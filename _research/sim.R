@@ -14,9 +14,9 @@ misspec <- as.numeric(args[1])
 
 g_learners <- "SL.mean"
 p_learners <- "SL.glm"
-mu_learners <- "SL.glmnet3"
-gamma_learners <- "SL.glmnet3"
-phi_learners <- "SL.glmnet3"
+mu_learners <- "SL.lightgbm"
+gamma_learners <- "SL.lightgbm"
+phi_learners <- "SL.lightgbm"
 
 if (misspec == 1) gamma_learners <- phi_learners <- "SL.mean"
 if (misspec == 2) mu_learners <- phi_learners <- "SL.mean"
@@ -25,7 +25,12 @@ if (misspec == 3) p_learners <- "SL.mean"
 res <- map_dfr(c(500, 1000, 5000, 1e4), function(n) {
   seed <- floor(runif(1, min = 1000, max = 1e5))
   dat <- gendata(n, seed)
-  psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1,
+
+  folds <- dplyr::case_when(n <= 1000 ~ 10,
+                            n == 5000 ~ 5,
+                            n > 5000 ~ 2)
+
+  psi <- dcme(dat, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", folds,
               g_learners = g_learners,
               p_learners = p_learners,
               mu_learners = mu_learners,

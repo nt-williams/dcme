@@ -46,7 +46,7 @@ make_table <- function(data) {
     kableExtra::collapse_rows(1, "middle")
 }
 
-i <- 0:2
+i <- 0:3
 files <- glue("_research/data/sim_{i}.zip")
 names(files) <- i
 
@@ -61,8 +61,9 @@ res_cide <- filter(res, param == "cide", n != 2000)
 spec_to_latex <- function(data) {
   mutate(data, spec = case_when(
     spec == 0 ~ "",
-    spec == 1 ~ "$\\E(Y \\mid M, Z, W)$",
-    spec == 2 ~ "$\\P(L \\mid A,W)$",
+    spec == 1 ~ "$\\gamma, \\phi$",
+    spec == 2 ~ "$\\mu, \\phi$",
+    spec == 3 ~ "$\\p$"
   ))
 }
 
