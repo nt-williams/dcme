@@ -3,7 +3,13 @@
 
 # dcme
 
+**D**ouble-**C**omplier **M**ediation **E**ffects with Instrumental
+Variables
+
 <!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Installation
@@ -24,10 +30,8 @@ library(dcme)
 n <- 1000
 w_1 <- rbinom(n, 1, prob = 0.6)
 w_2 <- rbinom(n, 1, prob = 0.3)
-w <- cbind(
-  w_1, w_2,
-  rbinom(n, 1, prob = pmin(0.2 + (w_1 + w_2) / 3, 1))
-)
+w <- cbind(w_1, w_2,
+           rbinom(n, 1, prob = pmin(0.2 + (w_1 + w_2) / 3, 1)))
 
 a <- rbinom(n, 1, prob = 0.5)
 l <- rbinom(n, 1, plogis(rowMeans(-log(2) + w + 3*a - 1)))
@@ -40,57 +44,10 @@ tmp <- as.data.frame(cbind(W = w, A = a, Z = z, L = l, M = m, Y = y))
 
 dcme(tmp, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1)
 #> Loading required package: nnls
-#> $TIIDE
-#> $TIIDE$psi
-#> [1] 0.1229145
-#> 
-#> $TIIDE$se
-#> [1] 0.04345169
-#> 
-#> $TIIDE$ci
-#> [1] 0.03775076 0.20807825
-#> 
-#> 
-#> $TIIIE
-#> $TIIIE$psi
-#> [1] -0.007386946
-#> 
-#> $TIIIE$se
-#> [1] 0.02061183
-#> 
-#> $TIIIE$ci
-#> [1] -0.04778538  0.03301149
-#> 
-#> 
-#> $JFS
-#> $JFS$psi
-#> [1] 0.300995
-#> 
-#> $JFS$se
-#> [1] 0.07415356
-#> 
-#> $JFS$ci
-#> [1] 0.1556567 0.4463333
-#> 
-#> 
-#> $CIDE
-#> $CIDE$psi
-#> [1] 0.4083606
-#> 
-#> $CIDE$se
-#> [1] 0.1888216
-#> 
-#> $CIDE$ci
-#> [1] 0.0382771 0.7784441
-#> 
-#> 
-#> $CIIE
-#> $CIIE$psi
-#> [1] -0.02454176
-#> 
-#> $CIIE$se
-#> [1] 0.0702691
-#> 
-#> $CIIE$ci
-#> [1] -0.1622667  0.1131832
+#>   Estimand    psi        95% CI
+#> 1    TIIDE  0.137  0.053, 0.221
+#> 2    TIIIE -0.014 -0.054, 0.026
+#> 3      JFS  0.387  0.255, 0.519
+#> 4     CIDE  0.353 -0.141, 0.069
+#> 5     CIIE -0.036  0.097, 0.610
 ```

@@ -15,10 +15,10 @@ dcme(
   family = c("binomial", "gaussian"),
   folds = 1,
   g_learners = "SL.glm",
-  q_learners = "SL.glm",
   p_learners = "SL.glm",
-  c_learners = "SL.glm",
-  y_learners = "SL.glm"
+  mu_learners = "SL.glm",
+  gamma_learners = "SL.glm",
+  phi_learners = "SL.glm"
 )
 }
 \arguments{
@@ -42,13 +42,13 @@ dcme(
 
 \item{g_learners}{SuperLearner library, default is "SL.glm"}
 
-\item{q_learners}{SuperLearner library, default is "SL.glm"}
-
 \item{p_learners}{SuperLearner library, default is "SL.glm"}
 
-\item{c_learners}{SuperLearner library, default is "SL.glm"}
+\item{mu_learners}{SuperLearner library, default is "SL.glm"}
 
-\item{y_learners}{SuperLearner library, default is "SL.glm"}
+\item{gamma_learners}{SuperLearner library, default is "SL.glm"}
+
+\item{phi_learners}{SuperLearner library, default is "SL.glm"}
 }
 \value{
 A list of parameter estimates and confidence intervals.

@@ -15,7 +15,10 @@ knitr::opts_chunk$set(
 
 # dcme
 
+**D**ouble-**C**omplier **M**ediation **E**ffects with Instrumental Variables
+
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Installation
@@ -35,10 +38,8 @@ library(dcme)
 n <- 1000
 w_1 <- rbinom(n, 1, prob = 0.6)
 w_2 <- rbinom(n, 1, prob = 0.3)
-w <- cbind(
-  w_1, w_2,
-  rbinom(n, 1, prob = pmin(0.2 + (w_1 + w_2) / 3, 1))
-)
+w <- cbind(w_1, w_2,
+           rbinom(n, 1, prob = pmin(0.2 + (w_1 + w_2) / 3, 1)))
 
 a <- rbinom(n, 1, prob = 0.5)
 l <- rbinom(n, 1, plogis(rowMeans(-log(2) + w + 3*a - 1)))

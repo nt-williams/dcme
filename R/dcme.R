@@ -10,10 +10,10 @@
 #' @param family Variable type for outcome, Y. Options are "binomial" or "gaussian"
 #' @param folds Number of folds for crossfitting
 #' @param g_learners SuperLearner library, default is "SL.glm"
-#' @param q_learners SuperLearner library, default is "SL.glm"
 #' @param p_learners SuperLearner library, default is "SL.glm"
-#' @param c_learners SuperLearner library, default is "SL.glm"
-#' @param y_learners SuperLearner library, default is "SL.glm"
+#' @param mu_learners SuperLearner library, default is "SL.glm"
+#' @param gamma_learners SuperLearner library, default is "SL.glm"
+#' @param phi_learners SuperLearner library, default is "SL.glm"
 #'
 #' @return A list of parameter estimates and confidence intervals.
 #'
@@ -42,34 +42,34 @@
 #' dcme(tmp, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1)
 dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), folds = 1,
                  g_learners = "SL.glm",
-                 q_learners = "SL.glm",
                  p_learners = "SL.glm",
-                 c_learners = "SL.glm",
-                 y_learners = "SL.glm") {
+                 mu_learners = "SL.glm",
+                 gamma_learners = "SL.glm",
+                 phi_learners = "SL.glm") {
 
   dgm <- Npsem$new(W, A, Z, M, L, Y)
   .data <- dgm$dt(data)
   folded <- make_folds(.data, folds)
 
   g <- fit_g(.data, dgm, folded, g_learners)
-  q <- fit_q(.data, dgm, folded, q_learners)
   p <- fit_p(.data, dgm, folded, p_learners)
-  cc <- fit_c(.data, dgm, folded, c_learners)
-  mu <- fit_mu(.data, dgm, q, cc, folded, match.arg(family), y_learners)
+  mu <- fit_mu(.data, dgm, folded, match.arg(family), mu_learners)
+  gamma <- fit_gamma(.data, dgm, folded, gamma_learners)
+  phi <- fit_phi(.data, dgm, folded, phi_learners)
 
-  D_v11 <- D_v(.data, dgm, 1, 1, g, q, p, cc, mu)
-  D_v10 <- D_v(.data, dgm, 1, 0, g, q, p, cc, mu)
-  D_v00 <- D_v(.data, dgm, 0, 0, g, q, p, cc, mu)
+  D_v11 <- D_v(.data, dgm, 1, 1, g, p, mu, gamma)
+  D_v10 <- D_v(.data, dgm, 1, 0, g, p, mu, gamma)
+  D_v00 <- D_v(.data, dgm, 0, 0, g, p, mu, gamma)
 
   D_TIIIE <- D_v11 - D_v10
   D_TIIDE <- D_v10 - D_v00
 
   # denominator (\Psi_JFS) --------------------------------------------------
 
-  Dphi_11 <- D_phi(.data, dgm, 1, 1, g, q, p, cc)
-  Dphi_10 <- D_phi(.data, dgm, 1, 0, g, q, p, cc)
-  Dphi_01 <- D_phi(.data, dgm, 0, 1, g, q, p, cc)
-  Dphi_00 <- D_phi(.data, dgm, 0, 0, g, q, p, cc)
+  Dphi_11 <- D_phi(.data, dgm, 1, 1, g, p, phi)
+  Dphi_10 <- D_phi(.data, dgm, 1, 0, g, p, phi)
+  Dphi_01 <- D_phi(.data, dgm, 0, 1, g, p, phi)
+  Dphi_00 <- D_phi(.data, dgm, 0, 0, g, p, phi)
 
   D_JFS <- Dphi_11 - Dphi_10 - Dphi_01 + Dphi_00
 
@@ -93,9 +93,11 @@ dcme <- function(data, W, A, L, Z, M, Y, family = c("binomial", "gaussian"), fol
     )
   )
 
-  lapply(params, function(p) {
+  res <- lapply(params, function(p) {
     se <- sqrt(var(p[[1]]) / nrow(data))
     ci <- p[[2]] + c(-1, 1)*qnorm(0.975)*se
     list(psi = p[[2]], se = se, ci = ci)
   })
+  class(res) <- "dcme_results"
+  res
 }
