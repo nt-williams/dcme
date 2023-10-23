@@ -1,0 +1,37 @@
+default:
+    learners: !expr 
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = c("mean", "glm", "lightgbm"),
+             gamma  = c("mean", "glm", "lightgbm"),
+             mu  = c("mean", "glm", "lightgbm"),
+             phi  = c("mean", "glm", "lightgbm"))
+
+nomisspec:
+    label: nomisspec
+
+gpmu: 
+    label: gpmu
+    learners: !expr 
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = c("mean", "glm", "lightgbm"),
+             gamma  = "mean",
+             mu  = c("mean", "glm", "lightgbm"),
+             phi  = "mean")
+
+gpgam:
+    label: gpgam
+    learners: !expr
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = c("mean", "glm", "lightgbm"),
+             gamma  = c("mean", "glm", "lightgbm"),
+             mu  = "mean",
+             phi  = "mean")
+
+mugamphi:
+    label: mugamphi
+    learners: !expr
+        list(g = "mean",
+             p  = "mean",
+             gamma  = c("mean", "glm", "lightgbm"),
+             mu  = c("mean", "glm", "lightgbm"),
+             phi  = c("mean", "glm", "lightgbm"))

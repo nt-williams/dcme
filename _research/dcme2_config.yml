@@ -1,0 +1,37 @@
+default:
+    learners: !expr 
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = c("mean", "glm", "lightgbm"),
+             b  = c("mean", "glm", "lightgbm"),
+             q  = c("mean", "glm", "lightgbm"),
+             zamma  = c("mean", "glm", "lightgbm"))
+
+nomisspec:
+    label: nomisspec
+
+gpqc:
+    label: gpqc
+    learners: !expr
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = c("mean", "glm", "lightgbm"),
+             b  = "mean",
+             q  = c("mean", "glm", "lightgbm"),
+             zamma  = c("mean", "glm", "lightgbm"))
+             
+pqcb:
+    label: pqcb
+    learners: !expr
+        list(g = "mean",
+             p  = c("mean", "glm", "lightgbm"),
+             b  = c("mean", "glm", "lightgbm"),
+             q  = c("mean", "glm", "lightgbm"),
+             zamma  = c("mean", "glm", "lightgbm"))
+
+gqcb:
+    label: gqcb
+    learners: !expr
+        list(g = c("mean", "glm", "lightgbm"),
+             p  = "mean",
+             b  = c("mean", "glm", "lightgbm"),
+             q  = c("mean", "glm", "lightgbm"),
+             zamma  = c("mean", "glm", "lightgbm"))
