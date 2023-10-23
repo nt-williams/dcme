@@ -1,5 +1,5 @@
 #' @export
-print.dcme_results <- function(x, ...) {
+print.dcme <- function(x, ...) {
   print(data.frame(Estimand = c("TIIDE", "TIIIE", "JFS", "CIDE", "CIIE"),
                    psi = sapply(c(x$TIIDE[[1]], x$TIIIE[[1]], x$JFS[[1]], x$CIDE[[1]], x$CIIE[[1]]),
                                 sprintf, fmt = "%.3f"),

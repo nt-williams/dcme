@@ -1,6 +1,6 @@
 Package: dcme
 Type: Package
-Title: Mediation Effects with 2 Instrumental Variables
+Title: Double Complier Mediated Effects
 Version: 0.1.0
 Authors@R: 
     c(person(given = "Nicholas",
@@ -17,14 +17,17 @@ Authors@R:
              email = "ivan.diaz@nyulangone.org",
              role = c("aut", "cph"),
              comment = c(ORCID = "0000-0001-9056-2047")))
-Maintainer: Nicholas Williams <ntw2117@cumc.columbia.edu>
-Description: Estimate complier interventional direct and indirect effects when two, 
-  possibly related, IVs are available, one for the exposure and another for the mediator.
-License: GPL (>= 3)
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Using instrumental variables to address unmeasured confounding in causal mediation analysis.
+License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Imports: 
     glue,
     origami,
-    purrr
-RoxygenNote: 7.2.1
+    R6
+Remotes: 
+    nt-williams
+Depends: 
+    mlr3superlearner (>= 0.1.2)
+RoxygenNote: 7.2.3

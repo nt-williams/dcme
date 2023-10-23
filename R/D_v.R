@@ -1,28 +1,53 @@
-D_v <- function(data, npsem, aprime, astar, g, p, mu, gamma) {
-  a <- npsem$get(data, "A")
-  l <- npsem$get(data, "L")
-  m <- npsem$get(data, "M")
-  z <- npsem$get(data, "Z")
-  y <- npsem$get(data, "Y")
+D_v <- function(data, vars, ap, as, mu, gamma, g, p) {
+    A <- vars$get(data, "A")
+    L <- vars$get(data, "L")
+    Y <- vars$get(data, "Y")
 
-  `P(a'|W)` <- g[, gl("g({aprime}|w)")]
-  `P(a*|W)` <- g[, gl("g({astar}|w)")]
-  `P(L|a',W)` <- l*p[, gl("p(L=1|{aprime},w)")] + (1 - l)*(1 - p[, gl("p(L=1|{aprime},w)")])
+    `I(A=a')` <- as.numeric(A == ap)
+    `I(A=a*)` <- as.numeric(A == as)
+    `P(A=a'|w)` <- ap*g[[gl("g(A=1|w)")]] + (1 - ap)*(1 - g[[gl("g(A=1|w)")]])
+    `P(A=a*|w)` <- as*g[[gl("g(A=1|w)")]] + (1 - as)*(1 - g[[gl("g(A=1|w)")]])
+    `P(L=l|a',w)` <- L*p[[gl("p(L=1|A={ap},w)")]] + (1 - L)*(1 - p[[gl("p(L=1|A={ap},w)")]])
+    `gamma(L=l|a*,w)` <- L*gamma[[gl("gamma(M=1|A={as},w)")]] +
+        (1 - L)*(1 - gamma[[gl("gamma(M=1|A={as},w)")]])
 
-  `mu(L,a',W)` <- l * mu[, gl("mu(Y|1,{aprime},w)")] + (1 - l) * mu[, gl("mu(Y|0,{aprime},w)")]
-  `mu(M,a',W)` <- m * mu[, gl("mu(Y|1,{aprime},w)")] + (1 - m) * mu[, gl("mu(Y|0,{aprime},w)")]
-  `mu(0,a',W)` <- mu[, gl("mu(Y|0,{aprime},w)")]
-  `mu(1,a',W)` <- mu[, gl("mu(Y|1,{aprime},w)")]
+    eval_v <- function(l, ap, as) {
+        `gamma(l|a*,w)` <- l*gamma[[gl("gamma(M=1|A={as},w)")]] +
+            (1 - l)*(1 - gamma[[gl("gamma(M=1|A={as},w)")]])
+        mu[[gl("mu(L={l},A={ap},w)")]]*`gamma(l|a*,w)`
+    }
 
-  `gamma(1|a*,W)` <- gamma[, gl("gamma(M=1|{astar},w)")]
-  `gamma(L|a*,W)` <- l * `gamma(1|a*,W)` + (1 - l) * (1 - `gamma(1|a*,W)`)
+    `v(a',a*)` <- eval_v(0, ap, as) + eval_v(1, ap, as)
+    `mu(l,a',w)` <- mu[[gl("mu(L=l,A={ap},w)")]]
 
-  `mu(0,a',W)gamma(0|a*,W)` <- `mu(0,a',W)` * (1 - `gamma(1|a*,W)`)
-  `mu(1,a',W)gamma(1|a*,W)` <- `mu(1,a',W)` * `gamma(1|a*,W)`
+    (`I(A=a')`*`gamma(L=l|a*,w)`) / (`P(L=l|a',w)`*`P(A=a'|w)`)*(Y - `mu(l,a',w)`) +
+        (`I(A=a*)` / `P(A=a*|w)`)*(`mu(l,a',w)` - `v(a',a*)`) +
+        `v(a',a*)`
+}
 
-  `v(a',a*)` <- mean(`mu(0,a',W)gamma(0|a*,W)`) + mean(`mu(1,a',W)gamma(1|a*,W)`)
+D_v2 <- function(data, vars, ap, as, b, c, q, g, p) {
+    A <- vars$get(data, "A")
+    L <- vars$get(data, "L")
+    Y <- vars$get(data, "Y")
 
-  ((I(a == aprime)*`gamma(L|a*,W)`) / (`P(L|a',W)`*`P(a'|W)`)) * (y - `mu(L,a',W)`) +
-    (I(a == astar)/`P(a*|W)`) * (`mu(M,a',W)` - (`mu(0,a',W)gamma(0|a*,W)` + `mu(1,a',W)gamma(1|a*,W)`)) +
-    (`mu(0,a',W)gamma(0|a*,W)` + `mu(1,a',W)gamma(1|a*,W)`)# - `v(a',a*)`
+    `I(A=a')` <- as.numeric(A == ap)
+    `I(A=a*)` <- as.numeric(A == as)
+    `P(A=a'|w)` <- ap*g[[gl("g(A=1|w)")]] + (1 - ap)*(1 - g[[gl("g(A=1|w)")]])
+    `P(A=a*|w)` <- as*g[[gl("g(A=1|w)")]] + (1 - as)*(1 - g[[gl("g(A=1|w)")]])
+    `P(L=l|a',w)` <- L*p[[gl("p(L=1|A={ap},w)")]] + (1 - L)*(1 - p[[gl("p(L=1|A={ap},w)")]])
+
+    `gamma(L=l|a*,w)` <- L*gammaN(as, c, q, p) + (1 - L)*(1 - gammaN(as, c, q, p))
+
+    eval_v <- function(l, ap, as) {
+        `gamma(l|a*,w)` <- l*gammaN(as, c, q, p) + (1 - l)*(1 - gammaN(as, c, q, p))
+        muN(ap, l, b, c, q)*`gamma(l|a*,w)`
+    }
+
+    `v(a',a*)` <- eval_v(0, ap, as) + eval_v(1, ap, as)
+
+    `mu(l,a',w)` <- L*muN(ap, 1, b, c, q) + (1 - L)*muN(ap, 0, b, c, q)
+
+    (`I(A=a')`*`gamma(L=l|a*,w)`) / (`P(L=l|a',w)`*`P(A=a'|w)`)*(Y - `mu(l,a',w)`) +
+        (`I(A=a*)` / `P(A=a*|w)`)*(`mu(l,a',w)` - `v(a',a*)`) +
+        `v(a',a*)`
 }
