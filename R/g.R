@@ -1,17 +1,17 @@
-fit_g <- function(data, npsem, folds, learners) {
-  g <- matrix(nrow = nrow(data), ncol = 2)
-  colnames(g) <- c("g(0|w)", "g(1|w)")
+# g(a|w)
+g <- function(data, vars, folds, learners) {
+    vals <- lapply(folds, function(x) {
+        train <- origami::training(data, x)
+        valid <- origami::validation(data, x)
 
-  for (v in seq_along(folds)) {
-    preds <- crossfit(origami::training(data, folds[[v]]),
-                      list(origami::validation(data, folds[[v]])),
-                      npsem$A, npsem$W,
-                      "binomial",
-                      learners = learners, bound = TRUE)[[1]]
+        fit <- mlr3superlearner(data[, c(vars$W, vars$A)],
+                                target = vars$A,
+                                library = learners,
+                                outcome_type = "binomial",
+                                newdata = list(valid[, vars$W, drop = FALSE]))
 
-    g[folds[[v]]$validation_set, "g(0|w)"] <- 1 - preds
-    g[folds[[v]]$validation_set, "g(1|w)"] <- preds
-  }
+        setNames(fit$preds, "g(A=1|w)")
+    })
 
-  g
+    lapply(revert_list(vals), reorder_cv, folds)
 }

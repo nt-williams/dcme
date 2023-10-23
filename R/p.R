@@ -1,19 +1,18 @@
-fit_p <- function(data, npsem, folds, learners) {
-  p <- matrix(nrow = nrow(data), ncol = 2)
-  colnames(p) <- c("p(L=1|1,w)", "p(L=1|0,w)")
+# p(l|a, w)
+p <- function(data, vars, folds, learners) {
+    vals <- lapply(folds, function(x) {
+        train <- origami::training(data, x)
+        valid <- origami::validation(data, x)
 
-  for (v in seq_along(folds)) {
-    train <- origami::training(data, folds[[v]])
+        fit <- mlr3superlearner(data[, c(vars$W, vars$A, vars$L)],
+                                target = vars$L,
+                                library = learners,
+                                outcome_type = "binomial",
+                                newdata = list(vars$modify(valid, "A", 0),
+                                               vars$modify(valid, "A", 1)))
 
-    valid <- lapply(c(1, 0), function(x) origami::validation(npsem$modify(data, "A", x), folds[[v]]))
+        setNames(fit$preds, c("p(L=1|A=0,w)", "p(L=1|A=1,w)"))
+    })
 
-    preds <- crossfit(train, valid, npsem$L, c(npsem$A, npsem$W),
-                      "binomial", learners = learners, bound = FALSE)
-
-    for (j in c(1, 2)) {
-      p[folds[[v]]$validation_set, j] <- preds[[j]]
-    }
-  }
-
-  p
+    lapply(revert_list(vals), reorder_cv, folds)
 }

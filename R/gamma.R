@@ -1,27 +1,27 @@
-fit_gamma <- function(data, npsem, folds, learners) {
-  gam <- matrix(nrow = nrow(data), ncol = 3)
-  colnames(gam) <- c("gamma(M=1|a,w)",
-                     "gamma(M=1|1,w)",
-                     "gamma(M=1|0,w)")
+# \gamma(m|a, w)
+gamma <- function(data, vars, folds, learners) {
+    vals <- lapply(folds, function(x) {
+        train <- origami::training(data, x)
+        valid <- origami::validation(data, x)
 
-  for (v in seq_along(folds)) {
-    train <- origami::training(data, folds[[v]])
+        fit <- mlr3superlearner(data[, c(vars$M, vars$A, vars$W)],
+                                target = vars$M,
+                                library = learners,
+                                outcome_type = "binomial",
+                                newdata = list(vars$modify(valid, "A", 1),
+                                               vars$modify(valid, "A", 0)))
+        setNames(fit$preds,
+                 c("gamma(M=1|A=1,w)", "gamma(M=1|A=0,w)"))
+    })
 
-    valid <- lapply(
-      list(
-        data,
-        npsem$modify(data, "A", 1),
-        npsem$modify(data, "A", 0)
-      ), function(x) origami::validation(x, folds[[v]])
-    )
+    lapply(revert_list(vals), reorder_cv, folds)
+}
 
-    preds <- crossfit(train, valid, npsem$M, c(npsem$A, npsem$W),
-                      "binomial", learners = learners, bound = TRUE)
+gammaN <- function(a, zamma, q, p) {
+    `q(Z=1|1,a*,w)` <- q[[gl("q(Z=1|L=1,A={a},w)")]]
+    `q(Z=1|0,a*,w)` <- q[[gl("q(Z=1|L=0,A={a},w)")]]
+    `p(L=1|a*,w)` <- p[[gl("p(L=1|A={a},w)")]]
 
-    for (j in 1:3) {
-      gam[folds[[v]]$validation_set, j] <- preds[[j]]
-    }
-  }
-
-  gam
+    (zamma[["c(M=1|L=1,Z=1,w)"]]*`q(Z=1|1,a*,w)` + zamma[["c(M=1|L=1,Z=0,w)"]]*(1 - `q(Z=1|1,a*,w)`))*`p(L=1|a*,w)` +
+        (zamma[["c(M=1|L=0,Z=1,w)"]]*`q(Z=1|1,a*,w)` + zamma[["c(M=1|L=0,Z=0,w)"]]*(1 - `q(Z=1|1,a*,w)`))*(1 - `p(L=1|a*,w)`)
 }

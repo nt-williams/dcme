@@ -26,6 +26,9 @@ devtools::install_github("nt-williams/dcme")
 
 ``` r
 library(dcme)
+#> Loading required package: mlr3superlearner
+#> Loading required package: mlr3learners
+#> Loading required package: mlr3
 
 n <- 1000
 w_1 <- rbinom(n, 1, prob = 0.6)
@@ -43,11 +46,15 @@ colnames(w) <- paste("W", seq_len(ncol(w)), sep = "")
 tmp <- as.data.frame(cbind(W = w, A = a, Z = z, L = l, M = m, Y = y))
 
 dcme(tmp, paste0("W", 1:3), "A", "L", "Z", "M", "Y", "binomial", 1)
-#> Loading required package: nnls
-#>   Estimand    psi        95% CI
-#> 1    TIIDE  0.137  0.053, 0.221
-#> 2    TIIIE -0.014 -0.054, 0.026
-#> 3      JFS  0.387  0.255, 0.519
-#> 4     CIDE  0.353 -0.141, 0.069
-#> 5     CIIE -0.036  0.097, 0.610
+#> ℹ n effective = 1000. Setting cross-validation folds as 10
+#> ℹ n effective = 1000. Setting cross-validation folds as 10
+#> ℹ n effective = 1000. Setting cross-validation folds as 10
+#> ℹ n effective = 1000. Setting cross-validation folds as 10
+#> ℹ n effective = 1000. Setting cross-validation folds as 10
+#>   Estimand   psi        95% CI
+#> 1    TIIDE 0.133  0.047, 0.218
+#> 2    TIIIE 0.012 -0.021, 0.046
+#> 3      JFS 0.354  0.216, 0.492
+#> 4     CIDE 0.374 -0.058, 0.128
+#> 5     CIIE 0.035  0.081, 0.668
 ```
